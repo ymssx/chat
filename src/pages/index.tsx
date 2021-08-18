@@ -7,6 +7,7 @@ const ChatPage: React.FC<void> = () => {
   const chatList = [
     { id: 'ewqeqw', name: 'YAMI' },
     { id: 'sadas', name: 'XMG' },
+    { id: 'dqwe', name: 'Roobot' },
   ]
   const [currentSelect, setCurrentSelect] = useState<number>(-1);
 
