@@ -19,13 +19,17 @@ const ChatPage: React.FC<void> = () => {
   return (
     <div className={styles['chat-page']}>
       <div className={styles['chat-list-wrapper']}>
-        <ChatList chatList={chatList} handleSelect={handleSelectChat} />
+        <ChatList
+          chatList={chatList}
+          selectedIndex={currentSelect}
+          handleSelect={handleSelectChat}
+        />
       </div>
       <div className={styles['chat-box-wrapper']}>
         { chatBox }
       </div>
     </div>
   );
-}
+};
 
 export default ChatPage;

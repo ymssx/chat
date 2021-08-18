@@ -3,14 +3,20 @@
   flex-direction: column;
 
   .chat-item {
+    display: flex;
+    padding: 10px;
     height: 60px;
 
     &:hover {
       background-color: #eee;
     }
 
-    &.selected {
-      background-color: #ddd;
+    .chat-info {
+      margin-left: 10px;
     }
+  }
+
+  .selected .chat-item {
+    background-color: #ddd;
   }
 }

@@ -18,23 +18,26 @@
       border-bottom: 3px solid transparent;
     }
 
+    @leftBubbleColor: #fff;
+    @rightBubbleColor: greenyellow;
+
     &.bubble-left {
       float: left;
-      background-color: #fff;
+      background-color: @leftBubbleColor;
 
       &:after {
         left: -3px;
-        border-right: 3px solid #fff;
+        border-right: 3px solid @leftBubbleColor;
       }
     }
 
     &.bubble-right {
       float: right;
-      background-color: greenyellow;
+      background-color: @rightBubbleColor;
 
       &:after {
         right: -3px;
-        border-left: solid 3px greenyellow;
+        border-left: solid 3px @rightBubbleColor;
       }
     }
   }
