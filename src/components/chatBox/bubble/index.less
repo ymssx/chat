@@ -1,0 +1,41 @@
+.bubble-wrapper {
+  width: 100%;
+
+  .bubble {
+    position: relative;
+    padding: 10px;
+    border-radius: 4px;
+    max-width: 45%;
+
+    &:after {
+      content: '';
+      display: block;
+      position: absolute;
+      top: 8px;
+      width: 0;
+      height: 0;
+      border-top: 3px solid transparent;
+      border-bottom: 3px solid transparent;
+    }
+
+    &.bubble-left {
+      float: left;
+      background-color: #fff;
+
+      &:after {
+        left: -3px;
+        border-right: 3px solid #fff;
+      }
+    }
+
+    &.bubble-right {
+      float: right;
+      background-color: greenyellow;
+
+      &:after {
+        right: -3px;
+        border-left: solid 3px greenyellow;
+      }
+    }
+  }
+}
