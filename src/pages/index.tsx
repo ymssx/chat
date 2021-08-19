@@ -8,14 +8,15 @@ const ChatPage: React.FC<void> = () => {
     { id: 'ewqeqw', name: 'YAMI' },
     { id: 'sadas', name: 'XMG' },
     { id: 'dqwe', name: 'Roobot' },
-  ]
+  ];
   const [currentSelect, setCurrentSelect] = useState<number>(-1);
 
   const handleSelectChat = (index: number) => setCurrentSelect(index);
 
-  const chatBox = currentSelect === -1
-    ? null
-    : <ChatBox chatUser={chatList[currentSelect]} />;
+  const chatBox =
+    currentSelect === -1 ? null : (
+      <ChatBox chatUser={chatList[currentSelect]} />
+    );
 
   return (
     <div className={styles['chat-page']}>
@@ -26,9 +27,7 @@ const ChatPage: React.FC<void> = () => {
           handleSelect={handleSelectChat}
         />
       </div>
-      <div className={styles['chat-box-wrapper']}>
-        { chatBox }
-      </div>
+      <div className={styles['chat-box-wrapper']}>{chatBox}</div>
     </div>
   );
 };

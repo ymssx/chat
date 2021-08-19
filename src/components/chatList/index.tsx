@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChatUser } from "@/const/common";
+import { ChatUser } from '@/const/common';
 import styles from './index.less';
 import UserAvatar from '@/components/avatar';
 
@@ -17,16 +17,23 @@ const ChatItem: React.FC<ChatItemProps> = ({ data }) => {
   const { id, name } = data;
   return (
     <div className={styles['chat-item']}>
-      <UserAvatar id={id} />
+      <div className={styles['avatar']}>
+        <UserAvatar id={id} name={name} />
+      </div>
       <div className={styles['chat-info']}>
-        <span>{name}</span>
+        <div className={styles['name']}>{name}</div>
+        <div className={styles['chat-sub']}>
+          <span className={styles['unread-dot']}>12</span>
+        </div>
       </div>
     </div>
   );
-}
+};
 
 const ChatList: React.FC<ChatListProps> = ({
-  chatList, selectedIndex, handleSelect
+  chatList,
+  selectedIndex,
+  handleSelect,
 }) => {
   return (
     <ul className={styles['chat-list']}>

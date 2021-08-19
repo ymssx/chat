@@ -1,43 +1,49 @@
+@leftBubbleColor: #d9f7be;
+@rightBubbleColor: #fff;
+
 .bubble-wrapper {
+  display: flow-root;
+  position: relative;
   width: 100%;
 
   .bubble {
     position: relative;
     padding: 10px;
-    border-radius: 4px;
+    border-radius: 6px;
     max-width: 45%;
 
     &:after {
       content: '';
       display: block;
       position: absolute;
-      top: 8px;
+      top: 10px;
       width: 0;
       height: 0;
-      border-top: 3px solid transparent;
-      border-bottom: 3px solid transparent;
+      border-top: 2px solid transparent;
+      border-bottom: 5px solid transparent;
     }
+  }
 
-    @leftBubbleColor: #fff;
-    @rightBubbleColor: greenyellow;
-
-    &.bubble-left {
+  &.bubble-left {
+    .bubble {
       float: left;
       background-color: @leftBubbleColor;
 
       &:after {
-        left: -3px;
-        border-right: 3px solid @leftBubbleColor;
+        left: -8px;
+        border-right: 8px solid @leftBubbleColor;
       }
     }
+  }
 
-    &.bubble-right {
+  &.bubble-right {
+    .bubble {
       float: right;
       background-color: @rightBubbleColor;
 
       &:after {
-        right: -3px;
-        border-left: solid 3px @rightBubbleColor;
+        right: -7px;
+        border-left: solid 7px @rightBubbleColor;
       }
     }
   }
