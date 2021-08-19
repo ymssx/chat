@@ -8,43 +8,66 @@
 
   .bubble {
     position: relative;
-    padding: 10px;
+    padding: 10px 12px;
     border-radius: 6px;
-    max-width: 45%;
+    max-width: 70%;
+    line-height: 22px;
+  }
 
-    &:after {
-      content: '';
-      display: block;
-      position: absolute;
-      top: 10px;
-      width: 0;
-      height: 0;
-      border-top: 2px solid transparent;
-      border-bottom: 5px solid transparent;
-    }
+  .name {
+    margin-bottom: 3px;
+    font-size: 12px;
+    color: #ddd;
+    line-height: 12px;
+    vertical-align: top;
+  }
+
+  .arrow {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 16px;
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
   }
 
   &.bubble-left {
+    .avatar {
+      float: left;
+      margin-right: 15px;
+    }
+
     .bubble {
       float: left;
       background-color: @leftBubbleColor;
+    }
 
-      &:after {
-        left: -8px;
-        border-right: 8px solid @leftBubbleColor;
-      }
+    .arrow {
+      left: -8px;
+      border-right: 8px solid @leftBubbleColor;
     }
   }
 
   &.bubble-right {
+    .avatar {
+      float: right;
+      margin-left: 15px;
+    }
+
+    .name {
+      display: none;
+    }
+
     .bubble {
       float: right;
       background-color: @rightBubbleColor;
+    }
 
-      &:after {
-        right: -7px;
-        border-left: solid 7px @rightBubbleColor;
-      }
+    .arrow {
+      right: -8px;
+      border-left: solid 8px @rightBubbleColor;
     }
   }
 }

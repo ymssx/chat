@@ -1,20 +1,20 @@
 import React from 'react';
-import { ChatUser } from '@/const/common';
+import { ChatSession, ChatUser } from '@/const/common';
 import styles from './index.less';
 import UserAvatar from '@/components/avatar';
 
 interface ChatItemProps {
-  data: ChatUser;
+  data: ChatSession;
 }
 
 interface ChatListProps {
-  chatList: ChatUser[];
+  chatList: ChatSession[];
   selectedIndex: number;
   handleSelect: (index: number) => void;
 }
 
 const ChatItem: React.FC<ChatItemProps> = ({ data }) => {
-  const { id, name } = data;
+  const { id, name, unreadNumber } = data;
   return (
     <div className={styles['chat-item']}>
       <div className={styles['avatar']}>
@@ -23,7 +23,11 @@ const ChatItem: React.FC<ChatItemProps> = ({ data }) => {
       <div className={styles['chat-info']}>
         <div className={styles['name']}>{name}</div>
         <div className={styles['chat-sub']}>
-          <span className={styles['unread-dot']}>12</span>
+          {unreadNumber ? (
+            <span className={styles['unread-dot']}>
+              {unreadNumber > 99 ? '99+' : unreadNumber}
+            </span>
+          ) : null}
         </div>
       </div>
     </div>

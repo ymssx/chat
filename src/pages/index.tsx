@@ -2,21 +2,16 @@ import React, { useState } from 'react';
 import ChatList from '@/components/chatList';
 import ChatBox from '@/components/chatBox';
 import styles from './index.less';
+import { getChatSessions } from '@/utils/chat';
 
 const ChatPage: React.FC<void> = () => {
-  const chatList = [
-    { id: 'ewqeqw', name: 'YAMI' },
-    { id: 'sadas', name: 'XMG' },
-    { id: 'dqwe', name: 'Roobot' },
-  ];
+  const chatList = getChatSessions();
   const [currentSelect, setCurrentSelect] = useState<number>(-1);
 
   const handleSelectChat = (index: number) => setCurrentSelect(index);
 
   const chatBox =
-    currentSelect === -1 ? null : (
-      <ChatBox chatUser={chatList[currentSelect]} />
-    );
+    currentSelect === -1 ? null : <ChatBox session={chatList[currentSelect]} />;
 
   return (
     <div className={styles['chat-page']}>
