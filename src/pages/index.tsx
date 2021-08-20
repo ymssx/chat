@@ -1,25 +1,53 @@
 import React, { useState } from 'react';
-import ChatList from '@/components/chatList';
+import { connect } from 'dva';
+import ChannelList from '@/components/channelList';
 import ChatBox from '@/components/chatBox';
 import styles from './index.less';
-import { getChatSessions } from '@/utils/chat';
+import { ChatState } from '@/models/chat';
+import { ChatChannel, ChatSession } from '@/const/common';
+import { getMessages, storeMessages } from '@/utils/chat';
+import { Message } from '@/const/message';
 
-const ChatPage: React.FC<void> = () => {
-  const chatList = getChatSessions();
-  const [currentSelect, setCurrentSelect] = useState<number>(-1);
+interface ChatPageProps {
+  channelMap: { [hash: string]: ChatChannel };
+  currentSessionId: string;
+  messages: Message[];
+  dispatch: Function;
+}
 
-  const handleSelectChat = (index: number) => setCurrentSelect(index);
+const ChatPage: React.FC<ChatPageProps> = ({
+  messages,
+  currentSessionId,
+  channelMap,
+  dispatch,
+}) => {
+  const chatBox = currentSessionId ? <ChatBox /> : null;
 
-  const chatBox =
-    currentSelect === -1 ? null : <ChatBox session={chatList[currentSelect]} />;
+  const handleSelect = (sessionId: string, hash: string) => {
+    dispatch({
+      type: 'chat/set-current-session-id',
+      payload: sessionId,
+    });
+
+    dispatch({
+      type: 'chat/take-messages',
+      payload: { sessionId, hash },
+    });
+
+    storeMessages(messages);
+    dispatch({
+      type: 'chat/set-messages',
+      payload: getMessages(hash, sessionId),
+    });
+  };
 
   return (
     <div className={styles['chat-page']}>
       <div className={styles['chat-list-wrapper']}>
-        <ChatList
-          chatList={chatList}
-          selectedIndex={currentSelect}
-          handleSelect={handleSelectChat}
+        <ChannelList
+          selectedSessionId={currentSessionId}
+          channelMap={channelMap}
+          handleSelect={handleSelect}
         />
       </div>
       <div className={styles['chat-box-wrapper']}>{chatBox}</div>
@@ -27,4 +55,9 @@ const ChatPage: React.FC<void> = () => {
   );
 };
 
-export default ChatPage;
+const mapStateToProps = ({ chat }: { chat: ChatState }) => {
+  const { channelMap, currentSessionId, messages } = chat;
+  return { channelMap, currentSessionId, messages };
+};
+
+export default connect(mapStateToProps)(ChatPage);

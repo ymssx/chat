@@ -1,35 +1,33 @@
 import React from 'react';
+import { connect } from 'dva';
 import { Message } from '@/const/message';
 import styles from './index.less';
 import UserAvatar from '@/components/avatar';
+import { UserState } from '@/models/user';
 
 interface BubbleProps {
   message: Message;
+  userId: string;
   color?: string;
   showAvatar?: boolean;
   showName?: boolean;
-  handleHover: (time: string) => void;
 }
 
 const Bubble: React.FC<BubbleProps> = ({
   message,
+  userId,
   color,
   showAvatar = false,
   showName = false,
-  handleHover,
 }) => {
-  // TODO: use redux
-  const currentUserId = 'ewqeqw';
+  const { id, time, sessionId, originId, content } = message;
 
-  const { id, time, target, origin, content } = message;
-
-  const bubbleClassName =
-    origin === currentUserId ? 'bubble-right' : 'bubble-left';
+  const bubbleClassName = originId === userId ? 'bubble-right' : 'bubble-left';
 
   const bubbleStyle = color ? { backgroundColor: color } : {};
 
   const arrowStyle =
-    origin === currentUserId
+    originId === userId
       ? { borderLeft: `solid 8px ${color}` }
       : { borderRight: `solid 8px ${color}` };
 
@@ -38,15 +36,10 @@ const Bubble: React.FC<BubbleProps> = ({
       className={[styles['bubble-wrapper'], styles[bubbleClassName]].join(' ')}
     >
       <div className={styles['avatar']}>
-        {showAvatar ? <UserAvatar id={origin} name={origin} /> : null}
+        {showAvatar ? <UserAvatar id={originId} name={originId} /> : null}
       </div>
-      {showName ? <div className={styles['name']}>{origin}</div> : null}
-      <div
-        className={styles['bubble']}
-        style={bubbleStyle}
-        onMouseEnter={() => handleHover(time)}
-        onMouseOut={() => handleHover('')}
-      >
+      {showName ? <div className={styles['name']}>{originId}</div> : null}
+      <div className={styles['bubble']} style={bubbleStyle}>
         {content}
         <div style={arrowStyle} className={styles['arrow']} />
       </div>
@@ -54,4 +47,9 @@ const Bubble: React.FC<BubbleProps> = ({
   );
 };
 
-export default Bubble;
+const mapStateToProps = ({ user }: { user: UserState }) => {
+  const { userId } = user;
+  return { userId };
+};
+
+export default connect(mapStateToProps)(Bubble);

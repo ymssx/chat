@@ -1,48 +1,52 @@
 import React, { useState, useEffect } from 'react';
-import { ChatSession } from '@/const/common';
+import { connect } from 'dva';
 import { Message } from '@/const/message';
-import { getMessage } from '@/utils/chat';
+import { getHistoryMessage } from '@/utils/chat';
 import Bubble from './bubble';
 import UserAvatar from '@/components/avatar';
 import { Input } from 'antd';
 import styles from './index.less';
 import { BUBBLE_COLOR_LIST } from '@/const/colors';
+import { sendMessage } from '@/server/sendMessage';
+import { UserState } from '@/models/user';
+import { ChatState } from '@/models/chat';
+import { ChatSession } from '@/const/common';
 
 const { TextArea } = Input;
 
 interface ChatBoxProps {
+  hash: string;
+  messages: Message[];
   session: ChatSession;
+  userId: string;
+  dispatch: Function;
 }
 
-const ChatBox: React.FC<ChatBoxProps> = ({ session }) => {
+const ChatBox: React.FC<ChatBoxProps> = ({
+  hash,
+  messages,
+  session,
+  userId,
+  dispatch,
+}) => {
+  if (!session) return null;
+
   const { id, name, members } = session;
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [lastSendMessageTime, setLastSendMessageTime] = useState<string>('');
-  // TODO: use redux
-  const currentUserId = 'ewqeqw';
-
-  useEffect(() => {
-    const newMessages = getMessage(id);
-    setMessages(newMessages);
-  }, [session]);
-
-  const handleHover = (time: string) => {
-    setLastSendMessageTime(time);
-  };
+  const [inputMessage, setInputMessage] = useState<string>('');
 
   const colorMap = new Map<string, string>();
   let colorIndex = 0;
-  const messageList = messages?.map((item) => {
-    const { id, origin } = item;
-    const isSelf = origin === currentUserId;
+  const messageList = messages?.map(item => {
+    const { id, originId } = item;
+    const isSelf = originId === userId;
     let color: string | undefined;
     if (!isSelf) {
-      if (colorMap.has(origin)) {
-        color = colorMap.get(origin);
+      if (colorMap.has(originId)) {
+        color = colorMap.get(originId);
       } else {
         color = BUBBLE_COLOR_LIST[colorIndex];
         colorIndex = (colorIndex + 1) % BUBBLE_COLOR_LIST.length;
-        colorMap.set(origin, color);
+        colorMap.set(originId, color);
       }
     }
 
@@ -52,21 +56,16 @@ const ChatBox: React.FC<ChatBoxProps> = ({ session }) => {
           message={item}
           color={color}
           showName={members.length > 2}
-          showAvatar={members.length > 2}
-          handleHover={handleHover}
+          showAvatar={members.length > 2 && !isSelf}
         />
       </li>
     );
   });
 
-  const lastMessageHint = lastSendMessageTime
-    ? `该消息回复于${lastSendMessageTime}`
-    : '';
-
   const avatarList = [];
   for (let index = 0; index < members.length; index++) {
     const memberId = members[index];
-    if (memberId !== currentUserId) {
+    if (memberId !== userId) {
       avatarList.push(
         <span className={styles['avatar']} key={memberId}>
           <UserAvatar id={memberId} name={memberId} />
@@ -78,6 +77,20 @@ const ChatBox: React.FC<ChatBoxProps> = ({ session }) => {
     }
   }
 
+  const handleInput = (e: any) => {
+    setInputMessage(e?.target?.value.replace('\n', ''));
+  };
+
+  const handleSendMessage = () => {
+    sendMessage({
+      hash,
+      sessionId: id,
+      originId: userId,
+      content: inputMessage?.trim(),
+    });
+    setInputMessage('');
+  };
+
   return (
     <div className={styles['chat-box']}>
       <div className={styles['chat-header']}>
@@ -85,15 +98,39 @@ const ChatBox: React.FC<ChatBoxProps> = ({ session }) => {
         <div className={styles['avatar-list']}>{avatarList}</div>
         <div className={styles['chat-info']}>
           <div className={styles['name']}>{name}</div>
-          <div className={styles['hint']}>{lastMessageHint}</div>
+          <div className={styles['hint']}>{'TODO'}</div>
         </div>
       </div>
       <ul className={styles['message-list']}>{messageList}</ul>
       <div className={styles['input']}>
-        <TextArea autoSize bordered={false} placeholder={'给ta发消息吧～'} />
+        <TextArea
+          autoSize
+          bordered={false}
+          value={inputMessage}
+          placeholder={'给ta发消息吧～'}
+          onChange={handleInput}
+          onPressEnter={handleSendMessage}
+        />
       </div>
     </div>
   );
 };
 
-export default ChatBox;
+const mapStateToProps = ({
+  user,
+  chat,
+}: {
+  user: UserState;
+  chat: ChatState;
+}) => {
+  const { userId } = user;
+  const { hash, currentSessionId, channelMap, messages } = chat;
+  return {
+    userId,
+    hash,
+    messages,
+    session: channelMap[hash].sessionMap[currentSessionId],
+  };
+};
+
+export default connect(mapStateToProps)(ChatBox);

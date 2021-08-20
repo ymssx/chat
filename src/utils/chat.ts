@@ -2,7 +2,7 @@ import { ChatSession } from '@/const/common';
 import { Message } from '@/const/message';
 
 const mockUserList = [
-  { id: 'ewqeqw', name: 'YAMI' },
+  { id: '5c3ba48f-8252-4330-9689-71f7876f5279', name: 'YAMI' },
   { id: 'sadas', name: 'XMG' },
   { id: 'dqwe', name: 'Roobot' },
   { id: 'zmsdi', name: 'DEMO' },
@@ -12,120 +12,159 @@ const mockData: { [id: string]: Message[] } = {
   asdwqe1: [
     {
       id: '123123',
+      hash: 'KUTKGKJ',
       time: '1996-09-23',
-      target: 'asdwqe1',
-      origin: 'sadas',
+      sessionId: 'asdwqe1',
+      originId: 'sadas',
       content: 'Hello~',
     },
     {
       id: 'e123123',
+      hash: 'KUTKGKJ',
       time: '1996-09-23',
-      target: 'asdwqe1',
-      origin: 'ewqeqw',
+      sessionId: 'asdwqe1',
+      originId: '5c3ba48f-8252-4330-9689-71f7876f5279',
       content: 'How are you?',
     },
     {
       id: 'e123e12123',
+      hash: 'KUTKGKJ',
       time: '1996-09-23',
-      target: 'asdwqe1',
-      origin: 'sadas',
+      sessionId: 'asdwqe1',
+      originId: 'sadas',
       content:
         'Early in the day it was whispered that we should sail in a boat, only thou and I, and never a soul in the world would know of this our pilgrimage to no country and to no end.',
     },
     {
       id: 'e1231dddd23',
+      hash: 'KUTKGKJ',
       time: '1996-09-23',
-      target: 'asdwqe1',
-      origin: 'ewqeqw',
+      sessionId: 'asdwqe1',
+      originId: '5c3ba48f-8252-4330-9689-71f7876f5279',
       content:
         'The time that my journey takes is long and the way of it long.I came out on the chariot of the first gleam of light, and pursued my voyage through the wildernesses of worlds leaving my track on many a star and planet.',
+    },
+    {
+      id: 'e12zdd23',
+      hash: 'KUTKGKJ',
+      time: '1996-09-23',
+      sessionId: 'asdwqe1',
+      originId: '5c3ba48f-8252-4330-9689-71f7876f5279',
+      content: '用户更关心的是对方的发言',
+    },
+    {
+      id: 'e12zdd13',
+      hash: 'KUTKGKJ',
+      time: '1996-09-23',
+      sessionId: 'asdwqe1',
+      originId: '5c3ba48f-8252-4330-9689-71f7876f5279',
+      content: '所以我的气泡是白色，对方是彩色',
     },
   ],
   asdwqsdae1: [
     {
       id: 'dqwe1eqw23',
+      hash: 'KUTKGKJ',
       time: '1996-09-23',
-      target: 'asdwqsdae1',
-      origin: 'sadas',
+      sessionId: 'asdwqsdae1',
+      originId: 'sadas',
       content: '上线！',
     },
     {
       id: '321dq321',
+      hash: 'KUTKGKJ',
       time: '1996-09-23',
-      target: 'asdwqsdae1',
-      origin: 'sadas',
+      sessionId: 'asdwqsdae1',
+      originId: 'sadas',
       content: '五黑五缺一',
     },
     {
       id: 'dq3213',
+      hash: 'KUTKGKJ',
       time: '1996-09-23',
-      target: 'asdwqsdae1',
-      origin: 'ewqeqw',
+      sessionId: 'asdwqsdae1',
+      originId: '5c3ba48f-8252-4330-9689-71f7876f5279',
       content: '不去，我要学习呢',
     },
   ],
   asdwewqda1e1: [
     {
       id: 'dqwe1eqw23',
+      hash: 'KUTKGKJ',
       time: '1996-09-23',
-      target: 'asdwewqda1e1',
-      origin: 'sadas',
+      sessionId: 'asdwewqda1e1',
+      originId: 'sadas',
       content: '只有在有必要时才会展现头像',
     },
     {
-      id: '321dq321',
+      id: 'dq32ddd13',
+      hash: 'KUTKGKJ',
       time: '1996-09-23',
-      target: 'asdwewqda1e1',
-      origin: 'dqwe',
+      sessionId: 'asdwewqda1e1',
+      originId: '5c3ba48f-8252-4330-9689-71f7876f5279',
+      content: '自己发言没有必要展示头像',
+    },
+    {
+      id: '321dq321',
+      hash: 'KUTKGKJ',
+      time: '1996-09-23',
+      sessionId: 'asdwewqda1e1',
+      originId: 'dqwe',
       content: '每个发言者都有不同色彩的气泡',
     },
     {
       id: 'dq3213',
+      hash: 'KUTKGKJ',
       time: '1996-09-23',
-      target: 'asdwewqda1e1',
-      origin: 'ewqeqw',
+      sessionId: 'asdwewqda1e1',
+      originId: '5c3ba48f-8252-4330-9689-71f7876f5279',
       content: '自己的发言为白色',
     },
     {
       id: 'Ad2dasd',
+      hash: 'KUTKGKJ',
       time: '1996-09-23',
-      target: 'asdwewqda1e1',
-      origin: 'f123',
+      sessionId: 'asdwewqda1e1',
+      originId: 'f123',
       content: '111111',
     },
     {
       id: 'B32fd213',
+      hash: 'KUTKGKJ',
       time: '1996-09-23',
-      target: 'asdwewqda1e1',
-      origin: 'dd82',
+      sessionId: 'asdwewqda1e1',
+      originId: 'dd82',
       content: '222222',
     },
     {
       id: 'dasdase12',
+      hash: 'KUTKGKJ',
       time: '1996-09-23',
-      target: 'asdwewqda1e1',
-      origin: 'dqwe',
+      sessionId: 'asdwewqda1e1',
+      originId: 'dqwe',
       content: '打乱队形',
     },
     {
       id: 'Cdddd211',
+      hash: 'KUTKGKJ',
       time: '1996-09-23',
-      target: 'asdwewqda1e1',
-      origin: 'dasd8213',
+      sessionId: 'asdwewqda1e1',
+      originId: 'dasd8213',
       content: '3333',
     },
     {
       id: 'D3332121',
+      hash: 'KUTKGKJ',
       time: '1996-09-23',
-      target: 'asdwewqda1e1',
-      origin: 'ddii21',
+      sessionId: 'asdwewqda1e1',
+      originId: 'ddii21',
       content: '44444',
     },
   ],
 };
 
-export const getMessage = (userId: string): Message[] => {
-  return mockData[userId] || [];
+export const getHistoryMessage = (sesssionId: string): Message[] => {
+  return mockData[sesssionId] || [];
 };
 
 export const getChatSessions = (): ChatSession[] => {
@@ -133,23 +172,26 @@ export const getChatSessions = (): ChatSession[] => {
     {
       id: 'asdwqe1',
       name: 'XMG',
-      members: ['ewqeqw', 'sadas'],
+      members: ['5c3ba48f-8252-4330-9689-71f7876f5279', 'sadas'],
       lastTime: '1996-12-32',
       lastMessage: 'test message',
-      unreadNumber: 3,
+      unreadNumber: 0,
     },
     {
       id: 'asdwqsdae1',
       name: 'Robot',
-      members: ['ewqeqw', 'dqwe'],
+      members: ['5c3ba48f-8252-4330-9689-71f7876f5279', 'dqwe'],
       lastTime: '2026-12-32',
       lastMessage: 'test message2',
-      unreadNumber: 1,
+      unreadNumber: 0,
     },
     {
       id: 'awqda1e1',
       name: 'SELF',
-      members: ['ewqeqw', 'ewqeqw'],
+      members: [
+        '5c3ba48f-8252-4330-9689-71f7876f5279',
+        '5c3ba48f-8252-4330-9689-71f7876f5279',
+      ],
       lastTime: '2026-12-32',
       lastMessage: 'test message3',
       unreadNumber: 0,
@@ -157,16 +199,16 @@ export const getChatSessions = (): ChatSession[] => {
     {
       id: 'asdwewqda1e1',
       name: 'Group',
-      members: ['ewqeqw', 'dqwe', 'zmsdi'],
+      members: ['5c3ba48f-8252-4330-9689-71f7876f5279', 'dqwe', 'zmsdi'],
       lastTime: '2026-12-32',
       lastMessage: 'test message3',
-      unreadNumber: 12,
+      unreadNumber: 0,
     },
     {
       id: 'zzzzzz',
       name: 'Big Group',
       members: [
-        'ewqeqw',
+        '5c3ba48f-8252-4330-9689-71f7876f5279',
         'dqwe',
         'zmsdi',
         'f123',
@@ -177,7 +219,28 @@ export const getChatSessions = (): ChatSession[] => {
       ],
       lastTime: '2026-12-32',
       lastMessage: 'test message3',
-      unreadNumber: 999,
+      unreadNumber: 0,
     },
   ];
+};
+
+const MESSAGE_STORE: {
+  [hash: string]: { [sessionId: string]: Message[] };
+} = {};
+
+export const storeMessages = (messages: Message[] = []) => {
+  if (messages.length === 0) return;
+
+  const { sessionId, hash } = messages[0];
+  if (!MESSAGE_STORE[hash]) {
+    MESSAGE_STORE[hash] = {};
+  }
+  MESSAGE_STORE[hash][sessionId] = messages;
+};
+
+export const getMessages = (hash: string, sessionId: string) => {
+  if (!MESSAGE_STORE[hash]) {
+    return [];
+  }
+  return MESSAGE_STORE[hash][sessionId] || [];
 };

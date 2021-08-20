@@ -1,7 +1,8 @@
-const SERVER_URL = 'http://127.0.0.1:7001';
+export const SERVER_URL = 'http://127.0.0.1:7001';
 
 const PATH: { [key: string]: string } = {
   getSessionList: '/api/chat/sessions/',
+  sendMessage: '/api/message/send', // POST
 };
 
 const API: { [key: string]: string } = {};

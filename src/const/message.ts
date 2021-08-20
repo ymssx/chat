@@ -1,7 +1,8 @@
 export interface Message {
   id: string;
+  hash: string;
   time: string;
-  target: string;
-  origin: string;
+  sessionId: string;
+  originId: string;
   content: string;
 }
