@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { connect } from 'dva';
-import ChannelList from '@/components/channelList';
+import ChannelList from '@/components/areaList';
 import ChatBox from '@/components/chatBox';
 import styles from './index.less';
 import { ChatState } from '@/models/chat';
 import { ChatChannel, ChatSession } from '@/const/common';
-import { getMessages, storeMessages } from '@/utils/chat';
+import { getMessages, setMessages } from '@/utils/chat';
 import { Message } from '@/const/message';
 
 interface ChatPageProps {
@@ -34,7 +34,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
       payload: { sessionId, hash },
     });
 
-    storeMessages(messages);
+    setMessages(messages);
     dispatch({
       type: 'chat/set-messages',
       payload: getMessages(hash, sessionId),
@@ -44,11 +44,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
   return (
     <div className={styles['chat-page']}>
       <div className={styles['chat-list-wrapper']}>
-        <ChannelList
-          selectedSessionId={currentSessionId}
-          channelMap={channelMap}
-          handleSelect={handleSelect}
-        />
+        <ChannelList handleSelect={handleSelect} />
       </div>
       <div className={styles['chat-box-wrapper']}>{chatBox}</div>
     </div>
