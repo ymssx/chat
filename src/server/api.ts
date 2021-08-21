@@ -1,5 +1,5 @@
-// export const SERVER_URL = 'http://47.100.197.192:7001';
-export const SERVER_URL = 'http://localhost:7001';
+export const SERVER_URL = 'http://47.100.197.192:7001';
+// export const SERVER_URL = 'http://localhost:7001';
 
 const PATH: { [key: string]: string } = {
   getSessionList: '/api/chat/sessions/',
