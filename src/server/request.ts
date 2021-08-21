@@ -2,12 +2,22 @@ import { getUserId } from '@/utils/id';
 import io from 'socket.io-client';
 import { SERVER_URL } from './api';
 
-const socket = io(SERVER_URL, {
-  query: {
-    userId: getUserId(),
-    hashList: JSON.stringify(['KUTKGKJ', 'ZZZZZ']),
-  },
-});
+let userName;
+let socket: SocketIOClient.Socket | undefined;
+if (localStorage.getItem('user-name')) {
+  userName = localStorage.getItem('user-name');
+  socket = io(SERVER_URL, {
+    query: {
+      userName: userName,
+      userId: getUserId(),
+      hashList: JSON.stringify(['KUTKGKJ', 'ZZZZZ']),
+    },
+  });
+} else {
+  if (window.location.pathname !== '/welcome') {
+    window.location.replace('/welcome');
+  }
+}
 
 export const request = {
   get(url: string, data: { [key: string]: string | number }) {

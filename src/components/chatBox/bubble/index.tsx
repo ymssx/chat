@@ -11,23 +11,26 @@ interface BubbleProps {
   color?: string;
   showAvatar?: boolean;
   showName?: boolean;
+  right?: boolean;
 }
 
 const Bubble: React.FC<BubbleProps> = ({
   message,
   userId,
   color,
+  right = false,
   showAvatar = false,
   showName = false,
 }) => {
   const { id, time, sessionId, originId, content } = message;
 
-  const bubbleClassName = originId === userId ? 'bubble-right' : 'bubble-left';
+  const bubbleClassName =
+    originId === userId || right ? 'bubble-right' : 'bubble-left';
 
   const bubbleStyle = color ? { backgroundColor: color } : {};
 
   const arrowStyle =
-    originId === userId
+    originId === userId || right
       ? { borderLeft: `solid 8px ${color}` }
       : { borderRight: `solid 8px ${color}` };
 

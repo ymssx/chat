@@ -6,7 +6,7 @@ interface AvatarProps {
   name: string;
 }
 
-const UserAvatar: React.FC<AvatarProps> = ({ id, name }) => {
+const UserAvatar: React.FC<AvatarProps> = ({ id, name = '?' }) => {
   return (
     <Avatar shape="square" size={40}>
       {name[0]}

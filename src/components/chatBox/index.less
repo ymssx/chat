@@ -7,26 +7,32 @@
   .chat-header {
     flex-shrink: 0;
     display: flex;
+    justify-content: space-between;
+    width: 100%;
     height: 60px;
     padding: 10px 20px;
 
-    .avatar-list {
-      .avatar {
-        margin-right: 10px;
-      }
-    }
+    .chat-target {
+      display: flex;
 
-    .chat-info {
-      .name {
-        line-height: 20px;
-        vertical-align: top;
+      .avatar-list {
+        .avatar {
+          margin-right: 10px;
+        }
       }
 
-      .hint {
-        color: #aaa;
-        font-size: 12px;
-        line-height: 20px;
-        vertical-align: bottom;
+      .chat-info {
+        .name {
+          line-height: 20px;
+          vertical-align: top;
+        }
+
+        .hint {
+          color: #aaa;
+          font-size: 12px;
+          line-height: 20px;
+          vertical-align: bottom;
+        }
       }
     }
   }
@@ -40,6 +46,10 @@
 
     > li {
       margin-bottom: 20px;
+    }
+
+    &::-webkit-scrollbar {
+      display: none;
     }
   }
 

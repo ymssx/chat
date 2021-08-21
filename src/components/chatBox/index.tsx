@@ -19,7 +19,6 @@ interface ChatBoxProps {
   hash: string;
   messages: Message[];
   session: ChatSession;
-  userId: string;
   dispatch: Function;
 }
 
@@ -29,10 +28,11 @@ const ChatBox: React.FC<ChatBoxProps> = ({
   hash,
   messages,
   session,
-  userId,
   dispatch,
 }) => {
   if (!session) return null;
+
+  const userId = getUserId();
 
   const { id, name, members } = session;
   const [inputMessage, setInputMessage] = useState<string>('');
@@ -41,7 +41,12 @@ const ChatBox: React.FC<ChatBoxProps> = ({
   useEffect(() => {
     setInputMessage(INPUT_STORE[id] ?? '');
     (inputBar?.current as any)?.focus();
-  }, [id]);
+  }, [id, hash]);
+
+  const messageEnd = useRef(null);
+  useEffect(() => {
+    (messageEnd.current as any).scrollIntoView();
+  }, [id, hash, messages]);
 
   const colorMap = new Map<string, string>();
   let colorIndex = 0;
@@ -95,6 +100,10 @@ const ChatBox: React.FC<ChatBoxProps> = ({
   };
 
   const handleSendMessage = () => {
+    if (!inputMessage?.trim()) {
+      return;
+    }
+
     const message = {
       hash,
       sessionId: id,
@@ -117,13 +126,18 @@ const ChatBox: React.FC<ChatBoxProps> = ({
     <div className={styles['chat-box']}>
       <div className={styles['chat-header']}>
         {/* <UserAvatar id={id} name={name} /> */}
-        <div className={styles['avatar-list']}>{avatarList}</div>
-        <div className={styles['chat-info']}>
-          <div className={styles['name']}>{name}</div>
-          <div className={styles['hint']}>{'TODO'}</div>
+        <div className={styles['chat-target']}>
+          <div className={styles['avatar-list']}>{avatarList}</div>
+          <div className={styles['chat-info']}>
+            <div className={styles['name']}>{name}</div>
+            <div className={styles['hint']}>{'TODO'}</div>
+          </div>
         </div>
       </div>
-      <ul className={styles['message-list']}>{messageList}</ul>
+      <ul className={styles['message-list']}>
+        {messageList}
+        <div ref={messageEnd} />
+      </ul>
       <div className={styles['input']}>
         <TextArea
           autoSize
@@ -139,20 +153,13 @@ const ChatBox: React.FC<ChatBoxProps> = ({
   );
 };
 
-const mapStateToProps = ({
-  user,
-  chat,
-}: {
-  user: UserState;
-  chat: ChatState;
-}) => {
-  const { userId } = user;
-  const { hash, currentSessionId, channelMap, messages } = chat;
+const mapStateToProps = ({ chat }: { chat: ChatState }) => {
+  const { hash, currentSessionId, channelMap, messages, newMessage } = chat;
   return {
-    userId,
     hash,
     messages,
     session: channelMap[hash].sessionMap[currentSessionId],
+    newMessage,
   };
 };
 

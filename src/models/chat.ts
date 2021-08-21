@@ -3,12 +3,14 @@ import { ChatChannel, ChatSession } from '@/const/common';
 import { Message } from '@/const/message';
 import { storeMessages } from '@/utils/chat';
 import { getUserId } from '@/utils/id';
+import { notification } from 'antd';
 
 export interface ChatState {
   channelMap: { [hash: string]: ChatChannel };
   currentSessionId: string;
   hash: string;
   messages: Message[];
+  newMessage: Message;
 }
 
 export enum Reducers {
@@ -18,11 +20,12 @@ export enum Reducers {
   SetSessionMap = 'set-session-map',
   SetSession = 'set-session',
   SetCurrentSessionId = 'set-current-session-id',
-  setHash = 'set-hash',
+  SetHash = 'set-hash',
   DispatchMessage = 'dispatch-message',
   TakeMessages = 'take-messages',
   SetMessages = 'set-messages',
   AddMessage = 'add-message',
+  SetNewMessage = 'set-new-message',
 }
 
 const updateSessonMap = (
@@ -72,6 +75,7 @@ export default {
     hash: 'KUTKGKJ',
     currentSessionId: null,
     messages: [],
+    newMessage: null,
     channelMap: {
       KUTKGKJ: {
         hash: 'KUTKGKJ',
@@ -83,24 +87,31 @@ export default {
         name: 'TEST CHANNEL 2',
         sessionMap: {},
       },
+      AAAAA: {
+        hash: 'AAAAA',
+        name: 'TEST CHANNEL 3',
+        sessionMap: {},
+      },
     },
   },
   reducers: {
     [Reducers.SetChannelMap](
       state: ChatState,
-      { payload: channelMap }: { payload: { [hash: string]: string[] } },
+      {
+        payload: channelMap,
+      }: { payload: { [hash: string]: { id: string; name: string }[] } },
     ) {
       for (const hash in channelMap) {
         const memberList = channelMap[hash];
         state.channelMap[hash].sessionMap = memberList.reduce(
-          (map: { [sessionId: string]: ChatSession }, userId) => {
-            map[userId] = {
-              id: userId,
-              name: userId,
+          (map: { [sessionId: string]: ChatSession }, { id, name }) => {
+            map[id] = {
+              id,
+              name,
               lastMessage: '',
               lastTime: '',
               unreadNumber: 0,
-              members: [userId, getUserId()],
+              members: [id, getUserId()],
             };
             return map;
           },
@@ -115,17 +126,17 @@ export default {
     [Reducers.AddSession](
       state: ChatState,
       {
-        payload: { userId, hashList },
-      }: { payload: { userId: string; hashList: string[] } },
+        payload: { id, name, hashList },
+      }: { payload: { name: string; id: string; hashList: string[] } },
     ) {
       for (const hash of hashList) {
-        state.channelMap[hash].sessionMap[userId] = {
-          id: userId,
-          name: userId,
+        state.channelMap[hash].sessionMap[id] = {
+          id,
+          name,
           lastMessage: '',
           lastTime: '',
           unreadNumber: 0,
-          members: [userId, getUserId()],
+          members: [id, getUserId()],
         };
       }
       return {
@@ -204,42 +215,63 @@ export default {
       };
     },
     [Reducers.AddMessage]: addMessage,
-    [Reducers.setHash](
+    [Reducers.SetHash](
       state: ChatState,
       { payload: hash }: { payload: string },
     ) {
       return { ...state, hash, currentSessionId: null };
     },
+    [Reducers.SetNewMessage](
+      state: ChatState,
+      { payload: message }: { payload: Message },
+    ) {
+      return { ...state, newMessage: message };
+    },
   },
   effects: {},
   subscriptions: {
+    notifications() {
+      window.addEventListener('load', () => {
+        Notification.requestPermission(status => {
+          console.log(status);
+        });
+      });
+    },
     socket({ dispatch }: { dispatch: Function }) {
-      socket.on('message', (res: any) => {
+      socket?.on('message', (res: any) => {
         const message = JSON.parse(res || '{}');
         console.log('new message', message);
+
+        dispatch({
+          type: Reducers.SetNewMessage,
+          payload: message,
+        });
+
         dispatch({
           type: Reducers.DispatchMessage,
           payload: message,
         });
       });
 
-      socket.on('init-channel', (res: any) => {
+      socket?.on('init-channel', (res: any) => {
         const channelMap = JSON.parse(res || '{}');
+        console.log(channelMap);
         dispatch({
           type: Reducers.SetChannelMap,
           payload: channelMap,
         });
       });
 
-      socket.on('user-connect', (res: any) => {
+      socket?.on('user-connect', (res: any) => {
         const user = JSON.parse(res || '{}');
+        console.log(user);
         dispatch({
           type: Reducers.AddSession,
           payload: user,
         });
       });
 
-      socket.on('user-disconnect', (res: any) => {
+      socket?.on('user-disconnect', (res: any) => {
         const user = JSON.parse(res || '{}');
         dispatch({
           type: Reducers.RemoveSession,
