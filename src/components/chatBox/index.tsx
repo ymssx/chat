@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { connect } from 'dva';
 import { Message } from '@/const/message';
-import { getHistoryMessage } from '@/utils/chat';
 import Bubble from './bubble';
 import UserAvatar from '@/components/avatar';
 import { Input } from 'antd';
 import styles from './index.less';
 import { BUBBLE_COLOR_LIST } from '@/const/colors';
-import { sendMessage } from '@/server/sendMessage';
+import { getUserId, uuid } from '@/utils/id';
+import API from '@/server/api';
+import { request } from '@/server/request';
 import { UserState } from '@/models/user';
 import { ChatState } from '@/models/chat';
 import { ChatSession } from '@/const/common';
@@ -22,6 +23,8 @@ interface ChatBoxProps {
   dispatch: Function;
 }
 
+const INPUT_STORE: { [id: string]: string } = {};
+
 const ChatBox: React.FC<ChatBoxProps> = ({
   hash,
   messages,
@@ -34,33 +37,41 @@ const ChatBox: React.FC<ChatBoxProps> = ({
   const { id, name, members } = session;
   const [inputMessage, setInputMessage] = useState<string>('');
 
+  const inputBar = useRef(null);
+  useEffect(() => {
+    setInputMessage(INPUT_STORE[id] ?? '');
+    (inputBar?.current as any)?.focus();
+  }, [id]);
+
   const colorMap = new Map<string, string>();
   let colorIndex = 0;
-  const messageList = messages?.map(item => {
-    const { id, originId } = item;
-    const isSelf = originId === userId;
-    let color: string | undefined;
-    if (!isSelf) {
-      if (colorMap.has(originId)) {
-        color = colorMap.get(originId);
-      } else {
-        color = BUBBLE_COLOR_LIST[colorIndex];
-        colorIndex = (colorIndex + 1) % BUBBLE_COLOR_LIST.length;
-        colorMap.set(originId, color);
+  const messageList = messages
+    ?.filter(item => members.includes(item.originId) && id === item.sessionId)
+    ?.map(item => {
+      const { id, originId } = item;
+      const isSelf = originId === userId;
+      let color: string | undefined;
+      if (!isSelf) {
+        if (colorMap.has(originId)) {
+          color = colorMap.get(originId);
+        } else {
+          color = BUBBLE_COLOR_LIST[colorIndex];
+          colorIndex = (colorIndex + 1) % BUBBLE_COLOR_LIST.length;
+          colorMap.set(originId, color);
+        }
       }
-    }
 
-    return (
-      <li key={id}>
-        <Bubble
-          message={item}
-          color={color}
-          showName={members.length > 2}
-          showAvatar={members.length > 2 && !isSelf}
-        />
-      </li>
-    );
-  });
+      return (
+        <li key={id}>
+          <Bubble
+            message={item}
+            color={color}
+            showName={members.length > 2}
+            showAvatar={members.length > 2 && !isSelf}
+          />
+        </li>
+      );
+    });
 
   const avatarList = [];
   for (let index = 0; index < members.length; index++) {
@@ -78,17 +89,28 @@ const ChatBox: React.FC<ChatBoxProps> = ({
   }
 
   const handleInput = (e: any) => {
-    setInputMessage(e?.target?.value.replace('\n', ''));
+    const message = e?.target?.value.replace('\n', '');
+    setInputMessage(message);
+    INPUT_STORE[id] = message;
   };
 
   const handleSendMessage = () => {
-    sendMessage({
+    const message = {
       hash,
       sessionId: id,
       originId: userId,
       content: inputMessage?.trim(),
+      time: String(new Date().getTime()),
+      id: uuid(),
+    };
+    dispatch({
+      type: 'chat/add-message',
+      payload: message,
     });
     setInputMessage('');
+    if (id !== getUserId()) {
+      request.post(API.sendMessage, message);
+    }
   };
 
   return (
@@ -105,6 +127,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
       <div className={styles['input']}>
         <TextArea
           autoSize
+          ref={inputBar}
           bordered={false}
           value={inputMessage}
           placeholder={'给ta发消息吧～'}

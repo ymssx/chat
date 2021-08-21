@@ -1,7 +1,13 @@
+import { getUserId } from '@/utils/id';
 import io from 'socket.io-client';
 import { SERVER_URL } from './api';
 
-const socket = io(SERVER_URL);
+const socket = io(SERVER_URL, {
+  query: {
+    userId: getUserId(),
+    hashList: JSON.stringify(['KUTKGKJ', 'ZZZZZ']),
+  },
+});
 
 export const request = {
   get(url: string, data: { [key: string]: string | number }) {

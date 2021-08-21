@@ -1,3 +1,4 @@
+import { uuid } from '@/utils/id';
 import API from './api';
 import { request } from './request';
 
@@ -21,6 +22,6 @@ export const sendMessage = ({
     originId,
     content,
     time,
-    id: time + origin,
+    id: uuid(),
   });
 };

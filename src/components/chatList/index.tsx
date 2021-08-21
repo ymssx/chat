@@ -2,6 +2,7 @@ import React from 'react';
 import { ChatSession } from '@/const/common';
 import styles from './index.less';
 import UserAvatar from '@/components/avatar';
+import { getUserId } from '@/utils/id';
 
 interface SessionItemProps {
   data: ChatSession;
@@ -22,7 +23,9 @@ const SessionItem: React.FC<SessionItemProps> = ({ data }) => {
         <UserAvatar id={id} name={name} />
       </div>
       <div className={styles['chat-info']}>
-        <div className={styles['name']}>{name}</div>
+        <div className={styles['name']}>
+          {id === getUserId() ? 'SELF' : name}
+        </div>
         <div className={styles['chat-sub']}>
           {unreadNumber ? (
             <span className={styles['unread-dot']}>
@@ -45,7 +48,6 @@ const SessionList: React.FC<SessionListProps> = ({
   const sessionList = [];
   for (const id in sessionMap) {
     const session = sessionMap[id];
-    console.log(id, selectedSessionId);
     session.selected = id === selectedSessionId;
     sessionList.push(session);
   }
