@@ -14,7 +14,9 @@ if (localStorage.getItem('user-name')) {
     },
   });
 } else {
-  if (window.location.pathname !== '/welcome') {
+  if (
+    !['/welcome', '/welcome/', 'welcome'].includes(window.location.pathname)
+  ) {
     window.location.replace('/welcome');
   }
 }
