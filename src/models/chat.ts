@@ -185,13 +185,15 @@ export default {
     ) {
       const { sessionId, time, content, hash } = message;
       const targetSession = state.channelMap[hash].sessionMap[sessionId];
-      if (state.currentSessionId !== sessionId && state.hash !== hash) {
+      const isCurrentSession = state.currentSessionId === sessionId && state.hash === hash;
+
+      if (!isCurrentSession) {
         targetSession.unreadNumber += 1;
       }
       targetSession.lastMessage = content;
       targetSession.lastTime = time;
 
-      if (state.currentSessionId !== sessionId && state.hash !== hash) {  
+      if (isCurrentSession) { 
         return updateSession(addMessage(state, { payload: message }), {
           payload: { newSession: targetSession, hash },
         });
