@@ -9,7 +9,6 @@ import { BUBBLE_COLOR_LIST } from '@/const/colors';
 import { getUserId, uuid } from '@/utils/id';
 import API from '@/server/api';
 import { request } from '@/server/request';
-import { UserState } from '@/models/user';
 import { ChatState } from '@/models/chat';
 import { ChatSession } from '@/const/common';
 

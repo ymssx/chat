@@ -3,7 +3,6 @@ import { ChatSession } from '@/const/common';
 import styles from './index.less';
 import UserAvatar from '@/components/avatar';
 import { getUserId } from '@/utils/id';
-import { getUserName } from '@/utils/user';
 
 interface SessionItemProps {
   data: ChatSession;
@@ -25,7 +24,8 @@ const SessionItem: React.FC<SessionItemProps> = ({ data }) => {
       </div>
       <div className={styles['chat-info']}>
         <div className={styles['name']}>
-          {id === getUserId() ? getUserName() : name}
+          {id === getUserId() ? <span>Self - </span> : null}
+          {name}
         </div>
         <div className={styles['chat-sub']}>
           {unreadNumber ? (

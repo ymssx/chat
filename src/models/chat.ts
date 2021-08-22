@@ -1,4 +1,4 @@
-import socket from '@/server/request';
+import { getSocket } from '@/server/request';
 import { ChatChannel, ChatSession } from '@/const/common';
 import { Message } from '@/const/message';
 import { storeMessages, getMessages, setMessages } from '@/utils/chat';
@@ -271,46 +271,48 @@ export default {
       });
     },
     socket({ dispatch }: { dispatch: Function }) {
-      socket?.on('message', (res: any) => {
-        const message = JSON.parse(res || '{}');
-        console.log('new message', message);
-
-        storeMessages([message]);
-
-        dispatch({
-          type: Reducers.SetNewMessage,
-          payload: message,
+      getSocket().then((socket) => {
+        socket?.on('message', (res: any) => {
+          const message = JSON.parse(res || '{}');
+          console.log('new message', message);
+  
+          storeMessages([message]);
+  
+          dispatch({
+            type: Reducers.SetNewMessage,
+            payload: message,
+          });
+  
+          dispatch({
+            type: Reducers.DispatchMessage,
+            payload: message,
+          });
         });
-
-        dispatch({
-          type: Reducers.DispatchMessage,
-          payload: message,
+  
+        socket?.on('init-channel', (res: any) => {
+          const channelMap = JSON.parse(res || '{}');
+          console.log(channelMap);
+          dispatch({
+            type: Reducers.SetChannelMap,
+            payload: channelMap,
+          });
         });
-      });
-
-      socket?.on('init-channel', (res: any) => {
-        const channelMap = JSON.parse(res || '{}');
-        console.log(channelMap);
-        dispatch({
-          type: Reducers.SetChannelMap,
-          payload: channelMap,
+  
+        socket?.on('user-connect', (res: any) => {
+          const user = JSON.parse(res || '{}');
+          console.log(user);
+          dispatch({
+            type: Reducers.AddSession,
+            payload: user,
+          });
         });
-      });
-
-      socket?.on('user-connect', (res: any) => {
-        const user = JSON.parse(res || '{}');
-        console.log(user);
-        dispatch({
-          type: Reducers.AddSession,
-          payload: user,
-        });
-      });
-
-      socket?.on('user-disconnect', (res: any) => {
-        const user = JSON.parse(res || '{}');
-        dispatch({
-          type: Reducers.RemoveSession,
-          payload: user,
+  
+        socket?.on('user-disconnect', (res: any) => {
+          const user = JSON.parse(res || '{}');
+          dispatch({
+            type: Reducers.RemoveSession,
+            payload: user,
+          });
         });
       });
     },
