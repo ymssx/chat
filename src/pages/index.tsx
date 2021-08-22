@@ -25,19 +25,8 @@ const ChatPage: React.FC<ChatPageProps> = ({
 
   const handleSelect = (sessionId: string, hash: string) => {
     dispatch({
-      type: 'chat/set-current-session-id',
-      payload: sessionId,
-    });
-
-    dispatch({
-      type: 'chat/take-messages',
-      payload: { sessionId, hash },
-    });
-
-    setMessages(messages);
-    dispatch({
-      type: 'chat/set-messages',
-      payload: getMessages(hash, sessionId),
+      type: 'chat/select-session',
+      payload: { messages, sessionId, hash },
     });
   };
 

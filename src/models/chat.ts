@@ -1,7 +1,7 @@
 import socket from '@/server/request';
 import { ChatChannel, ChatSession } from '@/const/common';
 import { Message } from '@/const/message';
-import { storeMessages } from '@/utils/chat';
+import { storeMessages, getMessages, setMessages } from '@/utils/chat';
 import { getUserId } from '@/utils/id';
 import { notification } from 'antd';
 
@@ -26,6 +26,16 @@ export enum Reducers {
   SetMessages = 'set-messages',
   AddMessage = 'add-message',
   SetNewMessage = 'set-new-message',
+}
+
+export enum Effects {
+  SelectSession = 'select-session',
+}
+
+interface EffectTools {
+  put: Function;
+  call: Function;
+  select: Function;
 }
 
 const updateSessonMap = (
@@ -79,7 +89,7 @@ export default {
     channelMap: {
       KUTKGKJ: {
         hash: 'KUTKGKJ',
-        name: 'TEST CHANNEL',
+        name: 'TEST CHANNEL 1',
         sessionMap: {},
       },
       ZZZZZ: {
@@ -175,14 +185,14 @@ export default {
     ) {
       const { sessionId, time, content, hash } = message;
       const targetSession = state.channelMap[hash].sessionMap[sessionId];
-      if (state.currentSessionId !== sessionId) {
+      if (state.currentSessionId !== sessionId && state.hash !== hash) {
         targetSession.unreadNumber += 1;
       }
       targetSession.lastMessage = content;
       targetSession.lastTime = time;
 
-      storeMessages([message]);
-      if (sessionId === state.currentSessionId) {
+      // storeMessages([message]);
+      if (state.currentSessionId !== sessionId && state.hash !== hash) {  
         return updateSession(addMessage(state, { payload: message }), {
           payload: { newSession: targetSession, hash },
         });
@@ -228,7 +238,29 @@ export default {
       return { ...state, newMessage: message };
     },
   },
-  effects: {},
+  effects: {
+    *[Effects.SelectSession](
+      { payload: { messages, sessionId, hash } }: { payload: { messages: Message[]; sessionId: string; hash: string } },
+      { put }: EffectTools,
+    ) {
+      yield put({
+        type: Reducers.SetCurrentSessionId,
+        payload: sessionId,
+      });
+  
+      yield put({
+        type: Reducers.TakeMessages,
+        payload: { sessionId, hash },
+      });
+  
+      yield setMessages(messages);
+
+      yield put({
+        type: Reducers.SetMessages,
+        payload: getMessages(hash, sessionId),
+      });
+    },
+  },
   subscriptions: {
     notifications() {
       window.addEventListener('load', () => {
