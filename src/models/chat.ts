@@ -191,7 +191,6 @@ export default {
       targetSession.lastMessage = content;
       targetSession.lastTime = time;
 
-      // storeMessages([message]);
       if (state.currentSessionId !== sessionId && state.hash !== hash) {  
         return updateSession(addMessage(state, { payload: message }), {
           payload: { newSession: targetSession, hash },
@@ -273,6 +272,8 @@ export default {
       socket?.on('message', (res: any) => {
         const message = JSON.parse(res || '{}');
         console.log('new message', message);
+
+        storeMessages([message]);
 
         dispatch({
           type: Reducers.SetNewMessage,
