@@ -1,9 +1,8 @@
 import React from 'react';
-import { connect } from 'dva';
 import { Message } from '@/const/message';
 import styles from './index.less';
 import UserAvatar from '@/components/avatar';
-import { UserState } from '@/models/user';
+import { getUserId } from '@/utils/id';
 
 interface BubbleProps {
   message: Message;
@@ -16,13 +15,13 @@ interface BubbleProps {
 
 const Bubble: React.FC<BubbleProps> = ({
   message,
-  userId,
   color,
   right = false,
   showAvatar = false,
   showName = false,
 }) => {
   const { id, time, sessionId, originId, content } = message;
+  const userId = getUserId();
 
   const bubbleClassName =
     originId === userId || right ? 'bubble-right' : 'bubble-left';
@@ -50,9 +49,4 @@ const Bubble: React.FC<BubbleProps> = ({
   );
 };
 
-const mapStateToProps = ({ user }: { user: UserState }) => {
-  const { userId } = user;
-  return { userId };
-};
-
-export default connect(mapStateToProps)(Bubble);
+export default Bubble;
