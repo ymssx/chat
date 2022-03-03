@@ -1,25 +1,30 @@
 import { getUserId } from '@/utils/id';
+import { getUserName } from '@/utils/user';
 import io from 'socket.io-client';
 import { SERVER_URL } from './api';
 
-let userName;
-let socket: SocketIOClient.Socket | undefined;
-if (localStorage.getItem('user-name')) {
-  userName = localStorage.getItem('user-name');
-  socket = io(SERVER_URL, {
-    query: {
-      userName: userName,
-      userId: getUserId(),
-      hashList: JSON.stringify(['KUTKGKJ', 'ZZZZZ']),
-    },
-  });
-} else {
-  if (
-    !['/welcome', '/welcome/', 'welcome'].includes(window.location.pathname)
-  ) {
-    window.location.replace('/welcome');
+let socket: SocketIOClient.Socket;
+export const getSocket = (): Promise<SocketIOClient.Socket> => {
+  if (socket !== undefined) {
+    return Promise.resolve(socket);
   }
-}
+  return new Promise((resolve, reject) => {
+    window.addEventListener('load', () => {
+      getUserName()
+        .then(name => {
+          socket = io(SERVER_URL, {
+            query: {
+              userName: name,
+              userId: getUserId(),
+              hashList: JSON.stringify(['KUTKGKJ', 'ZZZZZ']),
+            },
+          });
+          resolve(socket);
+        })
+        .catch(err => reject(err));
+    })
+  });
+};
 
 export const request = {
   get(url: string, data: { [key: string]: string | number }) {
@@ -42,4 +47,4 @@ export const request = {
   },
 };
 
-export default socket;
+export default getSocket;

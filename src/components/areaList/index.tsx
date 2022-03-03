@@ -49,19 +49,8 @@ const ChannelList: React.FC<ChannelListProps> = ({
     });
 
     dispatch({
-      type: 'chat/set-current-session-id',
-      payload: sessionId,
-    });
-
-    dispatch({
-      type: 'chat/take-messages',
+      type: 'chat/select-session',
       payload: { sessionId, hash: targetHash },
-    });
-
-    setMessages(messages);
-    dispatch({
-      type: 'chat/set-messages',
-      payload: getMessages(targetHash, sessionId),
     });
   };
 

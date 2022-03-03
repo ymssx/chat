@@ -1,7 +1,7 @@
-import socket from '@/server/request';
+import { getSocket } from '@/server/request';
 import { ChatChannel, ChatSession } from '@/const/common';
 import { Message } from '@/const/message';
-import { storeMessages } from '@/utils/chat';
+import { storeMessages, getMessages, setMessages } from '@/utils/chat';
 import { getUserId } from '@/utils/id';
 import { notification } from 'antd';
 
@@ -26,6 +26,16 @@ export enum Reducers {
   SetMessages = 'set-messages',
   AddMessage = 'add-message',
   SetNewMessage = 'set-new-message',
+}
+
+export enum Effects {
+  SelectSession = 'select-session',
+}
+
+interface EffectTools {
+  put: Function;
+  call: Function;
+  select: Function;
 }
 
 const updateSessonMap = (
@@ -79,7 +89,7 @@ export default {
     channelMap: {
       KUTKGKJ: {
         hash: 'KUTKGKJ',
-        name: 'TEST CHANNEL',
+        name: 'TEST CHANNEL 1',
         sessionMap: {},
       },
       ZZZZZ: {
@@ -175,14 +185,15 @@ export default {
     ) {
       const { sessionId, time, content, hash } = message;
       const targetSession = state.channelMap[hash].sessionMap[sessionId];
-      if (state.currentSessionId !== sessionId) {
+      const isCurrentSession = state.currentSessionId === sessionId && state.hash === hash;
+
+      if (!isCurrentSession) {
         targetSession.unreadNumber += 1;
       }
       targetSession.lastMessage = content;
       targetSession.lastTime = time;
 
-      storeMessages([message]);
-      if (sessionId === state.currentSessionId) {
+      if (isCurrentSession) { 
         return updateSession(addMessage(state, { payload: message }), {
           payload: { newSession: targetSession, hash },
         });
@@ -228,7 +239,29 @@ export default {
       return { ...state, newMessage: message };
     },
   },
-  effects: {},
+  effects: {
+    *[Effects.SelectSession](
+      { payload: { messages, sessionId, hash } }: { payload: { messages: Message[]; sessionId: string; hash: string } },
+      { put }: EffectTools,
+    ) {
+      yield put({
+        type: Reducers.SetCurrentSessionId,
+        payload: sessionId,
+      });
+  
+      yield put({
+        type: Reducers.TakeMessages,
+        payload: { sessionId, hash },
+      });
+  
+      yield setMessages(messages);
+
+      yield put({
+        type: Reducers.SetMessages,
+        payload: getMessages(hash, sessionId),
+      });
+    },
+  },
   subscriptions: {
     notifications() {
       window.addEventListener('load', () => {
@@ -238,44 +271,48 @@ export default {
       });
     },
     socket({ dispatch }: { dispatch: Function }) {
-      socket?.on('message', (res: any) => {
-        const message = JSON.parse(res || '{}');
-        console.log('new message', message);
-
-        dispatch({
-          type: Reducers.SetNewMessage,
-          payload: message,
+      getSocket().then((socket) => {
+        socket?.on('message', (res: any) => {
+          const message = JSON.parse(res || '{}');
+          console.log('new message', message);
+  
+          storeMessages([message]);
+  
+          dispatch({
+            type: Reducers.SetNewMessage,
+            payload: message,
+          });
+  
+          dispatch({
+            type: Reducers.DispatchMessage,
+            payload: message,
+          });
         });
-
-        dispatch({
-          type: Reducers.DispatchMessage,
-          payload: message,
+  
+        socket?.on('init-channel', (res: any) => {
+          const channelMap = JSON.parse(res || '{}');
+          console.log(channelMap);
+          dispatch({
+            type: Reducers.SetChannelMap,
+            payload: channelMap,
+          });
         });
-      });
-
-      socket?.on('init-channel', (res: any) => {
-        const channelMap = JSON.parse(res || '{}');
-        console.log(channelMap);
-        dispatch({
-          type: Reducers.SetChannelMap,
-          payload: channelMap,
+  
+        socket?.on('user-connect', (res: any) => {
+          const user = JSON.parse(res || '{}');
+          console.log(user);
+          dispatch({
+            type: Reducers.AddSession,
+            payload: user,
+          });
         });
-      });
-
-      socket?.on('user-connect', (res: any) => {
-        const user = JSON.parse(res || '{}');
-        console.log(user);
-        dispatch({
-          type: Reducers.AddSession,
-          payload: user,
-        });
-      });
-
-      socket?.on('user-disconnect', (res: any) => {
-        const user = JSON.parse(res || '{}');
-        dispatch({
-          type: Reducers.RemoveSession,
-          payload: user,
+  
+        socket?.on('user-disconnect', (res: any) => {
+          const user = JSON.parse(res || '{}');
+          dispatch({
+            type: Reducers.RemoveSession,
+            payload: user,
+          });
         });
       });
     },
