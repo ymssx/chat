@@ -185,7 +185,8 @@ export default {
     ) {
       const { sessionId, time, content, hash } = message;
       const targetSession = state.channelMap[hash].sessionMap[sessionId];
-      const isCurrentSession = state.currentSessionId === sessionId && state.hash === hash;
+      const isCurrentSession =
+        state.currentSessionId === sessionId && state.hash === hash;
 
       if (!isCurrentSession) {
         targetSession.unreadNumber += 1;
@@ -193,11 +194,19 @@ export default {
       targetSession.lastMessage = content;
       targetSession.lastTime = time;
 
-      if (isCurrentSession) { 
+      if (document.visibilityState !== 'visible') {
+        new Notification(content);
+      }
+
+      if (isCurrentSession) {
         return updateSession(addMessage(state, { payload: message }), {
           payload: { newSession: targetSession, hash },
         });
       } else {
+        if (document.visibilityState === 'visible') {
+          new Notification(content);
+        }
+
         return updateSession(state, {
           payload: { newSession: targetSession, hash },
         });
@@ -241,19 +250,21 @@ export default {
   },
   effects: {
     *[Effects.SelectSession](
-      { payload: { messages, sessionId, hash } }: { payload: { messages: Message[]; sessionId: string; hash: string } },
+      {
+        payload: { messages, sessionId, hash },
+      }: { payload: { messages: Message[]; sessionId: string; hash: string } },
       { put }: EffectTools,
     ) {
       yield put({
         type: Reducers.SetCurrentSessionId,
         payload: sessionId,
       });
-  
+
       yield put({
         type: Reducers.TakeMessages,
         payload: { sessionId, hash },
       });
-  
+
       yield setMessages(messages);
 
       yield put({
@@ -263,32 +274,25 @@ export default {
     },
   },
   subscriptions: {
-    notifications() {
-      window.addEventListener('load', () => {
-        Notification.requestPermission(status => {
-          console.log(status);
-        });
-      });
-    },
     socket({ dispatch }: { dispatch: Function }) {
-      getSocket().then((socket) => {
+      getSocket().then(socket => {
         socket?.on('message', (res: any) => {
           const message = JSON.parse(res || '{}');
           console.log('new message', message);
-  
+
           storeMessages([message]);
-  
+
           dispatch({
             type: Reducers.SetNewMessage,
             payload: message,
           });
-  
+
           dispatch({
             type: Reducers.DispatchMessage,
             payload: message,
           });
         });
-  
+
         socket?.on('init-channel', (res: any) => {
           const channelMap = JSON.parse(res || '{}');
           console.log(channelMap);
@@ -297,7 +301,7 @@ export default {
             payload: channelMap,
           });
         });
-  
+
         socket?.on('user-connect', (res: any) => {
           const user = JSON.parse(res || '{}');
           console.log(user);
@@ -306,7 +310,7 @@ export default {
             payload: user,
           });
         });
-  
+
         socket?.on('user-disconnect', (res: any) => {
           const user = JSON.parse(res || '{}');
           dispatch({
