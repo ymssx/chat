@@ -7,6 +7,7 @@ import styles from './index.less';
 import { ChatState } from '@/models/chat';
 import { ChatChannel, ChatSession } from '@/const/common';
 import { Message } from '@/const/message';
+import NotificationModal from '@/components/notification';
 import { Events } from '@/utils/user';
 
 interface ChatPageProps {
@@ -43,9 +44,11 @@ const ChatPage: React.FC<ChatPageProps> = ({
   const handleSetName = () => {
     if (!userName) return;
 
-    window.dispatchEvent(new CustomEvent(Events.SET_USERNAME, {
-      detail: { name: userName },
-    }));
+    window.dispatchEvent(
+      new CustomEvent(Events.SET_USERNAME, {
+        detail: { name: userName },
+      }),
+    );
     setNameDialogVisible(false);
   };
 
@@ -76,6 +79,8 @@ const ChatPage: React.FC<ChatPageProps> = ({
       >
         <Input onChange={handleInputName} />
       </Modal>
+
+      <NotificationModal />
     </div>
   );
 };
