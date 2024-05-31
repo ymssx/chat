@@ -1,8 +1,11 @@
 {
+  "name": "chat-client",
+  "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "umi dev",
-    "build": "umi build",
+    "dev": "export NODE_OPTIONS=--openssl-legacy-provider && umi dev",
+    "start": "export NODE_OPTIONS=--openssl-legacy-provider && umi build",
+    "build": "export NODE_OPTIONS=--openssl-legacy-provider && umi build",
     "postinstall": "umi generate tmp",
     "prettier": "prettier --write '**/*.{js,jsx,tsx,ts,less,md,json}'",
     "test": "umi-test",

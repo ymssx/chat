@@ -291,7 +291,7 @@ export default {
   
         socket?.on('init-channel', (res: any) => {
           const channelMap = JSON.parse(res || '{}');
-          console.log(channelMap);
+          console.log('init-channel', channelMap);
           dispatch({
             type: Reducers.SetChannelMap,
             payload: channelMap,
@@ -300,7 +300,7 @@ export default {
   
         socket?.on('user-connect', (res: any) => {
           const user = JSON.parse(res || '{}');
-          console.log(user);
+          console.log('user-connect', user);
           dispatch({
             type: Reducers.AddSession,
             payload: user,
