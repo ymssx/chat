@@ -1,5 +1,5 @@
 import { getUserId } from '@/utils/id';
-import { getUserName } from '@/utils/user';
+import { getUserInfo } from '@/utils/user';
 import io from 'socket.io-client';
 import { SERVER_URL } from './api';
 
@@ -10,13 +10,13 @@ export const getSocket = (): Promise<SocketIOClient.Socket> => {
   }
   return new Promise((resolve, reject) => {
     window.addEventListener('load', () => {
-      getUserName()
-        .then(name => {
+      getUserInfo()
+        .then(({ name }) => {
           socket = io(SERVER_URL, {
             query: {
               userName: name,
               userId: getUserId(),
-              hashList: JSON.stringify(['KUTKGKJ', 'ZZZZZ']),
+              hashList: JSON.stringify(['*']),
             },
           });
           resolve(socket);

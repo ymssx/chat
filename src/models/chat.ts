@@ -4,6 +4,8 @@ import { Message } from '@/const/message';
 import { storeMessages, getMessages, setMessages } from '@/utils/chat';
 import { getUserId } from '@/utils/id';
 import { notification } from 'antd';
+import { decryptWithPrivateKey, decryptWithSymmetricKey } from '@/utils/secret';
+import { getPrivateKey } from '@/utils/user';
 
 export interface ChatState {
   channelMap: { [hash: string]: ChatChannel };
@@ -25,6 +27,7 @@ export enum Reducers {
   TakeMessages = 'take-messages',
   SetMessages = 'set-messages',
   AddMessage = 'add-message',
+  ChangeMessage = 'change-message',
   SetNewMessage = 'set-new-message',
 }
 
@@ -79,27 +82,31 @@ const addMessage = (
   };
 };
 
+const changeMessage = (
+  state: ChatState,
+  { payload: message }: { payload: Message },
+) => {
+  const index = state.messages.findIndex(item => item.id === message.id);
+  if (index >= 0) {
+    state.messages[index] = message;
+  }
+  return {
+    ...state,
+    messages: [...state.messages],
+  };
+};
+
 export default {
   namespace: 'chat',
   state: {
-    hash: 'KUTKGKJ',
+    hash: '*',
     currentSessionId: null,
     messages: [],
     newMessage: null,
     channelMap: {
-      KUTKGKJ: {
-        hash: 'KUTKGKJ',
-        name: 'TEST CHANNEL 1',
-        sessionMap: {},
-      },
-      ZZZZZ: {
-        hash: 'ZZZZZ',
-        name: 'TEST CHANNEL 2',
-        sessionMap: {},
-      },
-      AAAAA: {
-        hash: 'AAAAA',
-        name: 'TEST CHANNEL 3',
+      ['*']: {
+        hash: '*',
+        name: '*',
         sessionMap: {},
       },
     },
@@ -184,7 +191,10 @@ export default {
       { payload: message }: { payload: Message },
     ) {
       const { sessionId, time, content, hash } = message;
-      const targetSession = state.channelMap[hash].sessionMap[sessionId];
+      const targetSession = state.channelMap[hash]?.sessionMap?.[sessionId];
+      if (!targetSession) {
+        return state;
+      }
       const isCurrentSession =
         state.currentSessionId === sessionId && state.hash === hash;
 
@@ -235,6 +245,7 @@ export default {
       };
     },
     [Reducers.AddMessage]: addMessage,
+    [Reducers.ChangeMessage]: changeMessage,
     [Reducers.SetHash](
       state: ChatState,
       { payload: hash }: { payload: string },
@@ -276,8 +287,22 @@ export default {
   subscriptions: {
     socket({ dispatch }: { dispatch: Function }) {
       getSocket().then(socket => {
-        socket?.on('message', (res: any) => {
+        socket?.on('message', async (res: any) => {
           const message = JSON.parse(res || '{}');
+          if (message.content) {
+            const sessionKeyMap = JSON.parse(localStorage.getItem('session-key-map') || '{}');
+            let symmetricKey = sessionKeyMap[message.sessionId]; // 优先从聊天id - 对称密钥中找密钥
+            if (!symmetricKey && message.token) { // 如果没有则根据邀请token在token - 对称密钥中找密钥
+              const tokenKeyMap = JSON.parse(localStorage.getItem('token-key-map') || '{}');
+              symmetricKey = tokenKeyMap[message.token];
+              sessionKeyMap[message.sessionId] = symmetricKey;
+              localStorage.setItem('session-key-map', JSON.stringify(sessionKeyMap)); // 存到聊天id - 对称密钥中
+            }
+            if (symmetricKey) {
+              message.content = await decryptWithSymmetricKey(message.content, symmetricKey);
+            }
+            message.content = await decryptWithPrivateKey(message.content, await getPrivateKey());
+          }
           console.log('new message', message);
 
           storeMessages([message]);

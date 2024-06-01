@@ -1,4 +1,4 @@
-// export const SERVER_URL = '/api';
+// export const SERVER_URL = 'http://localhost:7001';
 export const SERVER_URL = '';
 
 const PATH: { [key: string]: string } = {

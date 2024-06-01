@@ -6,7 +6,6 @@ import { getUserId } from '@/utils/id';
 
 interface BubbleProps {
   message: Message;
-  userId: string;
   color?: string;
   showAvatar?: boolean;
   showName?: boolean;

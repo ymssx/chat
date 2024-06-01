@@ -5,4 +5,6 @@ export interface Message {
   sessionId: string;
   originId: string;
   content: string;
+  isError?: boolean;
+  token?: string;
 }

@@ -8,10 +8,22 @@
     display: flex;
     overflow: hidden;
     flex-direction: column;
+    justify-content: space-between;
     width: 30%;
     max-width: 350px;
     min-width: 60px;
     background-color: #f1f1f1;
+
+    .chat-list-footer {
+      flex-shrink: 0;
+      padding: 10px 20px;
+      display: flex;
+      gap: 10px;
+
+      li {
+        cursor: pointer;
+      }
+    }
   }
 
   .chat-box-wrapper {

@@ -1,3 +1,5 @@
+import { USER_PUB_TOKEN_KEY, getUserInfo } from "./user";
+
 export const uuid = () => {
   let d = new Date().getTime();
   if (window.performance && typeof window.performance.now === 'function') {
@@ -14,12 +16,9 @@ export const uuid = () => {
 };
 
 export const getUserId = () => {
-  const existId = localStorage.getItem('user-id');
-  if (existId) {
-    return existId;
+  const token = localStorage.getItem(USER_PUB_TOKEN_KEY) || '';
+  if (!token) {
+    getUserInfo();
   }
-
-  const userId = uuid();
-  localStorage.setItem('user-id', userId);
-  return userId;
+  return token;
 };

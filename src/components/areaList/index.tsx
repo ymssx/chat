@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import { connect } from 'dva';
 import { Collapse } from 'antd';
 import { ChatChannel } from '@/const/common';
@@ -17,6 +17,7 @@ interface ChannelListProps {
   channelMap: { [hash: string]: ChatChannel };
   handleSelect: (sessionId: string, hash: string) => void;
   dispatch: Function;
+  footer?: ReactElement;
 }
 
 const ChannelList: React.FC<ChannelListProps> = ({
@@ -26,6 +27,7 @@ const ChannelList: React.FC<ChannelListProps> = ({
   channelMap,
   handleSelect,
   dispatch,
+  footer,
 }) => {
   const channelList = [];
   for (const hash in channelMap) {
@@ -56,7 +58,7 @@ const ChannelList: React.FC<ChannelListProps> = ({
 
   const panelHeader = ({ hash, name, sessionMap }: ChatChannel) => (
     <span>
-      {name ?? hash}
+      {(name ?? hash) === '*' ? '' : (name ?? hash)}
       <span
         onClick={event => handleJumpToUnread(event, hash)}
         className={styles['unread-dot']}
@@ -77,14 +79,14 @@ const ChannelList: React.FC<ChannelListProps> = ({
   };
 
   const channels = channelList.map(({ hash, name, sessionMap }) => (
-    <Panel key={hash} header={panelHeader({ hash, name, sessionMap })}>
+    // <Panel key={hash} header={panelHeader({ hash, name, sessionMap })}>
       <SessionList
         hash={hash}
         sessionMap={sessionMap}
         selectedSessionId={currentSessionId}
         handleSelect={handleSelect}
       />
-    </Panel>
+    // </Panel>
   ));
 
   return (
@@ -96,6 +98,7 @@ const ChannelList: React.FC<ChannelListProps> = ({
       onChange={handleChangeHash}
     >
       {channels}
+      {footer}
     </Collapse>
   );
 };

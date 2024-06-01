@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ChatSession } from '@/const/common';
 import styles from './index.less';
 import UserAvatar from '@/components/avatar';
 import { getUserId } from '@/utils/id';
+import classnames from 'classnames';
+import { getHashQuery } from '@/utils/util';
 
 interface SessionItemProps {
   data: ChatSession;
@@ -18,7 +20,7 @@ interface SessionListProps {
 const SessionItem: React.FC<SessionItemProps> = ({ data }) => {
   const { id, name, unreadNumber, lastMessage, lastTime } = data;
   return (
-    <div className={styles['chat-item']}>
+    <div className={classnames({ [styles['chat-item']]: true, [styles['has-message']]: unreadNumber > 0 })}>
       <div className={styles['avatar']}>
         <UserAvatar id={id} name={name} />
       </div>
@@ -46,12 +48,27 @@ const SessionList: React.FC<SessionListProps> = ({
   selectedSessionId,
   handleSelect,
 }) => {
-  const sessionList = [];
+  let sessionList = [];
+  const userId = getUserId();
+  const targetId = getHashQuery().id;
   for (const id in sessionMap) {
+    if (id === userId) {
+      continue;
+    }
     const session = sessionMap[id];
     session.selected = id === selectedSessionId;
     sessionList.push(session);
   }
+  const targetSession = sessionList.find(item => item.id === targetId);
+  if (targetSession) {
+    sessionList = [targetSession];
+  }
+
+  useEffect(() => {
+    if (targetId && !selectedSessionId) {
+      handleSelect(targetId, '*');
+    }
+  }, [targetId]);
 
   return (
     <ul className={styles['chat-list']}>

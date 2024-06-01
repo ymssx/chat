@@ -11,6 +11,8 @@ import API from '@/server/api';
 import { request } from '@/server/request';
 import { ChatState } from '@/models/chat';
 import { ChatSession } from '@/const/common';
+import { sendMessage } from '@/server/sendMessage';
+import { getHashQuery } from '@/utils/util';
 
 const { TextArea } = Input;
 
@@ -32,6 +34,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
   if (!session) return null;
 
   const userId = getUserId();
+  const chatToken = JSON.parse(localStorage.getItem('session-token-map') || '{}')[session.id];
 
   const { id, name, members } = session;
   const [inputMessage, setInputMessage] = useState<string>('');
@@ -69,7 +72,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
         <li key={id}>
           <Bubble
             message={item}
-            color={color}
+            color={item.isError ? '#ff6d91' : color}
             showName={members.length > 2}
             showAvatar={members.length > 2 && !isSelf}
           />
@@ -99,7 +102,8 @@ const ChatBox: React.FC<ChatBoxProps> = ({
   };
 
   const handleSendMessage = () => {
-    if (!inputMessage?.trim()) {
+    const content = inputMessage?.trim()
+    if (!content) {
       return;
     }
 
@@ -107,9 +111,10 @@ const ChatBox: React.FC<ChatBoxProps> = ({
       hash,
       sessionId: id,
       originId: userId,
-      content: inputMessage?.trim(),
+      content,
       time: String(new Date().getTime()),
       id: uuid(),
+      token: chatToken,
     };
     dispatch({
       type: 'chat/add-message',
@@ -117,7 +122,16 @@ const ChatBox: React.FC<ChatBoxProps> = ({
     });
     setInputMessage('');
     if (id !== getUserId()) {
-      request.post(API.sendMessage, message);
+      sendMessage(message)
+       .catch(() => {
+          dispatch({
+            type: 'chat/change-message',
+            payload: {
+              ...message,
+              isError: true,
+            },
+          });
+       });
     }
   };
 
@@ -129,7 +143,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
           <div className={styles['avatar-list']}>{avatarList}</div>
           <div className={styles['chat-info']}>
             <div className={styles['name']}>{name}</div>
-            <div className={styles['hint']}>{'TODO'}</div>
+            <div className={styles['hint']}>{id}</div>
           </div>
         </div>
       </div>

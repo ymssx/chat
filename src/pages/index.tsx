@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Input, Button } from 'antd';
 import { connect } from 'dva';
 import ChannelList from '@/components/areaList';
 import ChatBox from '@/components/chatBox';
@@ -9,6 +8,11 @@ import { ChatChannel, ChatSession } from '@/const/common';
 import { Message } from '@/const/message';
 import NotificationModal from '@/components/notification';
 import { Events } from '@/utils/user';
+import { genRequestUrl } from '@/utils/request-chat';
+import { getUserId } from '@/utils/id';
+import { Modal, message } from 'antd';
+
+const { confirm } = Modal;
 
 interface ChatPageProps {
   channelMap: { [hash: string]: ChatChannel };
@@ -23,15 +27,6 @@ const ChatPage: React.FC<ChatPageProps> = ({
   channelMap,
   dispatch,
 }) => {
-  const [nameDialogVisible, setNameDialogVisible] = useState(false);
-  const [userName, setUserName] = useState('');
-
-  useEffect(() => {
-    window.addEventListener(Events.OPEN_SET_NAME_USERNAME, () => {
-      setNameDialogVisible(true);
-    });
-  }, []);
-
   const chatBox = currentSessionId ? <ChatBox /> : null;
 
   const handleSelect = (sessionId: string, hash: string) => {
@@ -41,44 +36,39 @@ const ChatPage: React.FC<ChatPageProps> = ({
     });
   };
 
-  const handleSetName = () => {
-    if (!userName) return;
-
-    window.dispatchEvent(
-      new CustomEvent(Events.SET_USERNAME, {
-        detail: { name: userName },
-      }),
-    );
-    setNameDialogVisible(false);
-  };
-
-  const userNameFooter = (
-    <div>
-      <Button onClick={handleSetName}>确定</Button>
-    </div>
-  );
-
-  const handleInputName = (e: any) => {
-    setUserName(e?.target?.value);
+  const handleRequestChat = async () => {
+    const url = await genRequestUrl(getUserId());
+    confirm({
+      icon: null,
+      content: (
+        <div>
+          <h3>将下面链接发送给好友</h3>
+          <code>{url}</code>
+        </div>
+      ),
+      okText: 'Copy',
+      onOk() {
+        window.navigator?.clipboard
+          ?.writeText(url)
+          .then(() => {
+            message.success('Copied');
+          })
+          .catch((e) => {
+            message.error('Failed');
+          });
+      },
+    });
   };
 
   return (
     <div className={styles['chat-page']}>
       <div className={styles['chat-list-wrapper']}>
         <ChannelList handleSelect={handleSelect} />
+        <ul className={styles['chat-list-footer']}>
+          <li onClick={handleRequestChat}>邀请聊天</li>
+        </ul>
       </div>
       <div className={styles['chat-box-wrapper']}>{chatBox}</div>
-
-      {/* Set User Name */}
-      <Modal
-        closable={false}
-        maskClosable={false}
-        visible={nameDialogVisible}
-        footer={userNameFooter}
-        title={'你的名字'}
-      >
-        <Input onChange={handleInputName} />
-      </Modal>
 
       <NotificationModal />
     </div>

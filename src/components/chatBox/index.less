@@ -14,6 +14,7 @@
 
     .chat-target {
       display: flex;
+      overflow: hidden;
 
       .avatar-list {
         .avatar {
@@ -22,6 +23,8 @@
       }
 
       .chat-info {
+        overflow: hidden;
+
         .name {
           line-height: 18px;
           font-size: 18px;
@@ -33,7 +36,11 @@
           font-size: 12px;
           line-height: 12px;
           margin-top: 10px;
+          max-width: 30%;
           vertical-align: bottom;
+          white-space: no-wrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
       }
     }
